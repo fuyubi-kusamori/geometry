@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <title>cube</title>
+    <style>
+        body { margin: 0; height: 100vh; overflow: hidden; background: #000; }
+        .box {
+            position: absolute;
+            width: 100px; height: 100px;
+            transform-style: preserve-3d;
+            transform-origin: center center;
+        }
+        .face {
+            position: absolute; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid #ccc;
+        }
+        .front  { transform: translateZ(50px); }
+        .back   { transform: rotateY(180deg) translateZ(50px); }
+        .right  { transform: rotateY(90deg) translateZ(50px); }
+        .left   { transform: rotateY(-90deg) translateZ(50px); }
+        .top    { transform: rotateX(90deg) translateZ(50px); }
+        .bottom { transform: rotateX(-90deg) translateZ(50px); }
+    </style>
+</head>
+<body>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            for (let i = 0; i < 10; i++) {
+                const box = document.createElement('div');
+                box.className = 'box';
+                box.style.left = `${Math.random() * (window.innerWidth - 100)}px`;
+                box.style.top = `${Math.random() * (window.innerHeight - 100)}px`;
+                const randomX = Math.random() * 360;
+                const randomY = Math.random() * 360;
+                const duration = Math.random() * 4 + 2; // random duration between 2 and 6 seconds
+
+                box.style.animation = `rotate${i} ${duration}s infinite linear`;
+
+                const faces = ['front', 'back', 'right', 'left', 'top', 'bottom'];
+                faces.forEach(face => {
+                    const div = document.createElement('div');
+                    div.className = 'face ' + face;
+                    box.appendChild(div);
+                });
+
+                box.style.transform = `rotateX(${randomX}deg) rotateY(${randomY}deg)`;
+
+                document.body.appendChild(box);
+
+                createKeyframes(i, randomX, randomY, duration);
+            }
+        });
+
+        function createKeyframes(index, initialX, initialY, duration) {
+            const styleSheet = document.styleSheets[0];
+            const keyframes = 
+            `@keyframes rotate${index} {
+                from { transform: rotateX(${initialX}deg) rotateY(${initialY}deg); }
+                to { transform: rotateX(${initialX + 360}deg) rotateY(${initialY + 360}deg); }
+            }`;
+            styleSheet.insertRule(keyframes, styleSheet.cssRules.length);
+        }
+    </script>
+</body>
+</html>

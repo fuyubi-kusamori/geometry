@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Snowflakes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Symbols+2&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; height: 100vh; background: #000; overflow: hidden;}
+  .snowflake { position: absolute; top: -10px; color: #fff; user-select: none; font-family:}
+</style>
+</head>
+<body>
+<script>
+function createSnowflake() {
+  const snowflake = document.createElement('div');
+  snowflake.textContent = '❄';
+  snowflake.style.cssText = 'position: absolute; color: #fff; user-select: none;';
+  snowflake.style.fontSize = `${Math.random() * 24 + 10}px`;
+  snowflake.style.opacity = Math.random();
+  // 初期位置と3D回転を設定
+  snowflake.style.transform = `translate3d(${Math.random() * window.innerWidth}px, -10px, 0) rotateX(0deg) rotateY(0deg) rotateZ(0deg)`;
+
+  document.body.appendChild(snowflake);
+
+  setTimeout(() => {
+    snowflake.style.transition = `transform ${Math.random() * 5 + 5}s linear`;
+    // 落下時の位置とランダムな3D回転
+    snowflake.style.transform = `translate3d(${Math.random() * window.innerWidth - 100}px, ${window.innerHeight + 10}px, 0) rotateX(${Math.random() * 360}deg) rotateY(${Math.random() * 360}deg) rotateZ(${Math.random() * 360}deg)`;
+    setTimeout(() => snowflake.remove(), 6000);
+  }, 50);
+}
+
+setInterval(createSnowflake, 100);
+</script>
+</body>
+</html>
