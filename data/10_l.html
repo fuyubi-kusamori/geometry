@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Dandelion</title>
+    <link rel="shortcut icon" type="image/ico" href="favicon.ico" />
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #000;
+        }
+        .fluff {
+            position: absolute;
+            width: 2px;
+            background-color: #fff;
+        }
+        .fluff-tip {
+            position: absolute;
+            border-radius: 50%;
+            background-color: #fff;
+        }
+        .stem {
+            position: absolute;
+            width: 3px;
+            height: 100px;
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+<div id="dandelion"></div>
+<script>
+    function drawFluff(startX, startY, length, angle, depth) {
+        if (depth === 0) {
+            const tip = document.createElement('div');
+            tip.className = 'fluff-tip';
+            tip.style.left = `${startX - 2}px`;
+            tip.style.top = `${startY - 2}px`;
+            tip.style.width = '4px';
+            tip.style.height = '4px';
+            tip.style.borderRadius = '50%';
+            tip.style.backgroundColor = '#ffffff';
+            tip.style.position = 'absolute';
+            document.body.appendChild(tip);
+            // マウスオーバーまたはクリックで綿毛が飛ぶようにイベントリスナーを設定
+            tip.addEventListener('mouseover', event => flyAway(event, tip));
+            tip.addEventListener('click', event => flyAway(event, tip));
+            return tip; // 修正された部分
+        }
+        const endX = startX + length * Math.cos(angle);
+        const endY = startY + length * Math.sin(angle);
+        const fluff = document.createElement('div');
+        fluff.className = 'fluff';
+        fluff.style.left = `${startX}px`;
+        fluff.style.top = `${startY}px`;
+        fluff.style.width = `${length}px`;
+        fluff.style.height = '1px';
+        fluff.style.backgroundColor = '#fff';
+        fluff.style.transformOrigin = 'bottom left';
+        fluff.style.transform = `rotate(${angle}rad)`;
+        fluff.style.position = 'absolute';
+        document.body.appendChild(fluff);
+        const tip = drawFluff(endX, endY, length * 0.7, angle - 0.2, depth - 1);
+        const tip2 = drawFluff(endX, endY, length * 0.7, angle + 0.2, depth - 1);
+        // 毛にもイベントリスナーを追加
+        fluff.addEventListener('mouseover', event => {
+            flyAway(event, tip);
+            flyAway(event, tip2);
+            flyAway(event, fluff); // 自分自身も飛ぶように
+        });
+        fluff.addEventListener('click', event => {
+            flyAway(event, tip);
+            flyAway(event, tip2);
+            flyAway(event, fluff); // 自分自身も飛ぶように
+        });
+        return null; // この戻り値は使用しない
+    }
+
+    function drawDandelion(x, y, numberOfFluffs) {
+        for (let i = Math.PI; i < 2 * Math.PI; i += Math.PI / numberOfFluffs) {
+            drawFluff(x, y, 50, i, 3);
+        }
+        drawStem(x, y);
+    }
+
+    function drawStem(x, y) {
+        const stem = document.createElement('div');
+        stem.className = 'stem';
+        stem.style.left = `${x}px`;
+        stem.style.top = `${y}px`;
+        document.body.appendChild(stem);
+    }
+
+    function flyAway(event, element) {
+        const moveX = 3000 - Math.random() * 6000; // 大幅に移動距離を増やす
+        const moveY = 3000 - Math.random() * 6000; // 大幅に移動距離を増やす
+        const rotate = Math.random() * 360;
+        element.style.transition = 'transform 10s linear, opacity 5s ease-out'; // トランジション時間を増やして、失速しないように調整
+        element.style.transform = `translate(${moveX}px, ${moveY}px) rotate(${rotate}deg)`;
+        setTimeout(() => {
+            element.remove();
+        }, 10000); // 10秒後に確実に削除
+    }
+
+    drawDandelion(window.innerWidth / 2, window.innerHeight / 2 - 50, 100);
+</script>
+</body>
+</html>
