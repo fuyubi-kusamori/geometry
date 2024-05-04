@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Character</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="content-style-type" content="text/css" /> 
+<meta http-equiv="content-script-type" content="text/javascript" /> 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Slab:wght@100&family=Sacramento&display=swap" rel="stylesheet">
+<link rel="shortcut icon" type="image/ico" href="../data/favicon.ico" />
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  background-color: black;
+  perspective: 1000px;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotateY(0deg);
+  }
+  50% {
+    transform: rotateY(180deg);
+  }
+  100% {
+    transform: rotateY(360deg);
+  }
+}
+
+.letter {
+  font-family: 'Josefin Slab', YuGothic, 'Yu Gothic', sans-serif;
+  position: absolute;
+  color: white;
+  animation: spin infinite;
+  animation-duration: 5s;
+  animation-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  transform-style: preserve-3d;
+}
+
+</style>
+</head>
+<body onclick="location.reload();">
+<script>
+const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+letters.forEach((letter, i) => {
+  const el = document.createElement('div');
+  el.className = 'letter';
+  el.textContent = letter;
+  el.style.animationDelay = `${i * 0.1}s`;
+  el.style.animationDirection = Math.random() < 0.5 ? 'normal' : 'reverse';
+  el.style.transform = `rotateY(${Math.random() * 360}deg)`;
+  el.style.top = `${Math.random() * 100}vh`;
+  el.style.left = `${Math.random() * 100}vw`;
+  el.style.fontSize = `${30 + Math.random() * 300}px`;
+  el.style.opacity = `${0.3 + Math.random() * 0.7}`;
+  document.body.appendChild(el);
+});
+</script>
+</body>
+</html>

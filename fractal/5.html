@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Sierpinski Triangle</title>
+<link rel="shortcut icon" type="image/ico" href="../data/favicon.ico" />
+<style>
+  body { margin: 0; overflow: hidden; background: #fff; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="sierpinskiCanvas"></canvas>
+<script>
+  const canvas = document.getElementById('sierpinskiCanvas');
+  const ctx = canvas.getContext('2d');
+  let alpha = 0.3; // アルファ値の初期値
+
+  // ウィンドウのリサイズに対応
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    drawSierpinski();
+  }
+  window.addEventListener('resize', resizeCanvas);
+
+  let depth = 0; // 再帰の深さの初期値
+
+  function drawTriangle(vertices, depth) {
+    if (depth === 0) {
+      const [A, B, C] = vertices;
+      ctx.beginPath();
+      ctx.moveTo(A.x, A.y);
+      ctx.lineTo(B.x, B.y);
+      ctx.lineTo(C.x, C.y);
+      ctx.lineTo(A.x, A.y);
+      ctx.fillStyle = `hsla(${Math.random() * 360}, 100%, 50%, ${alpha})`; // 色をランダムに設定し、アルファ値を適用
+      ctx.fill();
+    } else {
+      const [A, B, C] = vertices;
+      let AB_mid = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 };
+      let BC_mid = { x: (B.x + C.x) / 2, y: (B.y + C.y) / 2 };
+      let CA_mid = { x: (C.x + A.x) / 2, y: (C.y + A.y) / 2 };
+
+      drawTriangle([A, AB_mid, CA_mid], depth - 1);
+      drawTriangle([B, BC_mid, AB_mid], depth - 1);
+      drawTriangle([C, CA_mid, BC_mid], depth - 1);
+    }
+  }
+
+  function drawSierpinski() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // キャンバスをクリア
+    let sideLength = Math.min(canvas.width, canvas.height) * 0.8; // サイドの長さはブラウザの小さい方の80%
+    const height = sideLength * Math.sqrt(3) / 2; // 正三角形の高さを計算
+    const vertices = [
+      { x: canvas.width / 2, y: (canvas.height - height) / 2 },
+      { x: (canvas.width - sideLength) / 2, y: (canvas.height + height) / 2 },
+      { x: (canvas.width + sideLength) / 2, y: (canvas.height + height) / 2 }
+    ];
+
+    drawTriangle(vertices, depth % 7); // 深さを7で循環させる
+    depth = (depth + 1) % 7; // 深さを増加させ、7で循環させる
+  }
+
+  // アニメーションの更新をsetIntervalで行う
+  setInterval(drawSierpinski, 500); // 500ミリ秒ごとに更新
+
+  // 初回のアニメーションを開始
+  resizeCanvas(); // この行を追加
+</script>
+</body>
+</html>

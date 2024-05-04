@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Koch Snowflake</title>
+<link rel="shortcut icon" type="image/ico" href="../data/favicon.ico" />
+<style>
+  body { margin: 0; overflow: hidden; background: #000; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="kochCanvas"></canvas>
+<script>
+  const canvas = document.getElementById('kochCanvas');
+  const ctx = canvas.getContext('2d');
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  resizeCanvas();
+
+  let currentDepth = 0;
+  const maxDepth = 7;
+  const animationDelay = 500;
+  let animationTimeoutId; // アニメーションのタイマーIDを格納する変数
+
+  function drawLine(start, end, depth) {
+    if (depth === 0) {
+      ctx.beginPath();
+      ctx.moveTo(start.x, start.y);
+      ctx.lineTo(end.x, end.y);
+      ctx.strokeStyle = 'white';
+      ctx.stroke();
+    } else {
+      const dx = end.x - start.x;
+      const dy = end.y - start.y;
+
+      const segment1End = { x: start.x + dx / 3, y: start.y + dy / 3 };
+      const segment3Start = { x: start.x + 2 * dx / 3, y: start.y + 2 * dy / 3 };
+
+      const midPointX = start.x + dx / 2;
+      const midPointY = start.y + dy / 2;
+      const length = Math.sqrt(dx * dx + dy * dy) / 3;
+      const angle = Math.atan2(dy, dx) - Math.PI / 3;
+      const segment2End = {
+        x: midPointX + Math.cos(angle) * length,
+        y: midPointY + Math.sin(angle) * length
+      };
+
+      drawLine(start, segment1End, depth - 1);
+      drawLine(segment1End, segment2End, depth - 1);
+      drawLine(segment2End, segment3Start, depth - 1);
+      drawLine(segment3Start, end, depth - 1);
+    }
+  }
+
+  function drawKochSnowflake() {
+    if (currentDepth > maxDepth) {
+      currentDepth = 0;
+    }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const size = Math.min(canvas.width, canvas.height) * 0.8;
+    const height = size * Math.sqrt(3) / 2;
+
+    const yOffset = canvas.height * 0.1;
+
+    const vertices = [
+      { x: canvas.width / 2, y: canvas.height / 2 + height / 3 + yOffset },
+      { x: canvas.width / 2 - size / 2, y: canvas.height / 2 - height / 3 + yOffset },
+      { x: canvas.width / 2 + size / 2, y: canvas.height / 2 - height / 3 + yOffset },
+    ];
+
+    drawLine(vertices[0], vertices[1], currentDepth);
+    drawLine(vertices[1], vertices[2], currentDepth);
+    drawLine(vertices[2], vertices[0], currentDepth);
+
+    currentDepth++;
+    clearTimeout(animationTimeoutId); // 前のアニメーションタイマーをクリア
+    animationTimeoutId = setTimeout(drawKochSnowflake, animationDelay);
+  }
+
+  window.addEventListener('resize', () => {
+    resizeCanvas();
+    clearTimeout(animationTimeoutId); // リサイズ時にもタイマーをクリア
+    currentDepth = 0; // 深度をリセット
+    drawKochSnowflake(); // アニメーションをリスタート
+  });
+
+  drawKochSnowflake();
+</script>
+</body>
+</html>

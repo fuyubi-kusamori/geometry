@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Sierpinski Triangle</title>
+<link rel="shortcut icon" type="image/ico" href="../data/favicon.ico" />
+<style>
+  body { margin: 0; overflow: hidden; background: #000; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="sierpinskiCanvas"></canvas>
+<script>
+  const canvas = document.getElementById('sierpinskiCanvas');
+  const ctx = canvas.getContext('2d');
+
+  let currentDepth = 0;
+  const maxDepth = 10; // 最大の深度を調整可能
+  const animationDelay = 500; // アニメーションの遅延を500ミリ秒に設定
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    drawSierpinski();
+  }
+
+  function drawTriangle(vertices, depth) {
+    if (depth === 0) {
+      const [A, B, C] = vertices;
+      ctx.beginPath();
+      ctx.moveTo(A.x, A.y);
+      ctx.lineTo(B.x, B.y);
+      ctx.lineTo(C.x, C.y);
+      ctx.lineTo(A.x, A.y);
+      ctx.fillStyle = 'white';
+      ctx.fill();
+      ctx.closePath();
+    } else {
+      const [A, B, C] = vertices;
+      let AB_mid = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 };
+      let BC_mid = { x: (B.x + C.x) / 2, y: (B.y + C.y) / 2 };
+      let CA_mid = { x: (C.x + A.x) / 2, y: (C.y + A.y) / 2 };
+
+      drawTriangle([A, AB_mid, CA_mid], depth - 1);
+      drawTriangle([B, BC_mid, AB_mid], depth - 1);
+      drawTriangle([C, CA_mid, BC_mid], depth - 1);
+    }
+  }
+
+  function drawSierpinski() {
+    if (currentDepth > maxDepth) {
+      currentDepth = 0; // 深度を0にリセットして再描画
+    }
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // キャンバスをクリア
+    let height;
+    if (canvas.width < canvas.height) { // スマホの場合
+      height = canvas.width * 0.8; // 横幅の80%
+    } else { // PCの場合
+      height = canvas.height * 0.8; // 高さの80%
+    }
+    const baseLength = height / (Math.sqrt(3) / 2); // 底辺を計算
+    const vertices = [
+      { x: canvas.width / 2, y: (canvas.height - height) / 2 },
+      { x: (canvas.width - baseLength) / 2, y: (canvas.height + height) / 2 },
+      { x: (canvas.width + baseLength) / 2, y: (canvas.height + height) / 2 }
+    ];
+
+    drawTriangle(vertices, currentDepth);
+    currentDepth++;
+  }
+
+  // リサイズイベントに対するイベントリスナーを追加
+  window.addEventListener('resize', resizeCanvas);
+
+  resizeCanvas(); // 初期描画としても関数を呼び出し
+  
+  // アニメーションを開始
+  setInterval(drawSierpinski, animationDelay);
+
+</script>
+</body>
+</html>

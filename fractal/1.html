@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Mandelbrot set</title>
+<link rel="shortcut icon" type="image/ico" href="../data/favicon.ico" />
+<style>
+  body { margin: 0; overflow: hidden; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="fractalCanvas"></canvas>
+<script>
+  const canvas = document.getElementById('fractalCanvas');
+  const ctx = canvas.getContext('2d');
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  let hue = 0;
+
+  function drawFractal() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // キャンバスをクリア
+
+    const width = canvas.width;
+    const height = canvas.height;
+    const scale = 0.4; // フラクタルのスケール
+    const moveX = -0.5; // X軸方向の中心をずらす
+    const moveY = 0; // Y軸方向の中心をずらす
+
+    for (let x = 0; x < width; x++) {
+      for (let y = 0; y < height; y++) {
+        let zx = 1.5 * (x - width / 2) / (0.5 * scale * width) + moveX;
+        let zy = (y - height / 2) / (0.5 * scale * height) + moveY;
+        let i = 0;
+        const maxIter = 100; // この値を調整して、色の変化をより明確にすることもできます
+
+        let cX = zx, cY = zy; // マンデルブロ集合の計算で使用する定数
+
+        while (zx * zx + zy * zy < 4 && i < maxIter) {
+          let tmp = zx * zx - zy * zy + cX;
+          zy = 2.0 * zx * zy + cY;
+          zx = tmp;
+          i++;
+        }
+
+        const ratio = i / maxIter;
+        ctx.fillStyle = `hsl(${hue}, 100%, ${ratio * 100}%)`;
+        ctx.fillRect(x, y, 1, 1);
+      }
+    }
+
+    hue += 15; // 色相をより顕著に変化させるために増加量を大きくする
+    if (hue > 360) hue = 0; // 色相が360を超えたら0に戻す
+    requestAnimationFrame(drawFractal); // 再帰的に関数を呼び出す
+  }
+
+  drawFractal(); // フラクタルの描画を開始
+</script>
+</body>
+</html>

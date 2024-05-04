@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Dragon curve</title>
+<link rel="shortcut icon" type="image/ico" href="../data/favicon.ico" />
+<style>
+  body { margin: 0; overflow: hidden; background: #000; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="dragonCanvas"></canvas>
+<script>
+  const canvas = document.getElementById('dragonCanvas');
+  const ctx = canvas.getContext('2d');
+  let y_offset; // y軸のオフセットをグローバルに宣言
+
+  // ウィンドウサイズが変更されたときにキャンバスのサイズを再設定
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // 画面のアスペクト比に基づいてy軸のオフセットを設定
+    if(window.innerWidth > window.innerHeight) {
+      // 横長の画面の場合
+      y_offset = canvas.height - (canvas.height * 0.3); // 画面の下から30%の位置
+    } else {
+      // 縦長の画面の場合
+      y_offset = canvas.height - (canvas.height * 0.5); // 画面の下から50%の位置
+    }
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  let currentIteration = 0;
+  const maxIteration = 15; // 最大の繰り返し回数を調整可能
+  const animationDelay = 500; // アニメーションの遅延を500ミリ秒に設定
+
+  function dragonCurve(points, iteration) {
+    if (iteration === 0) {
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, points[0].y);
+      for (let i = 1; i < points.length; i++) {
+        ctx.lineTo(points[i].x, points[i].y);
+      }
+      ctx.strokeStyle = 'white';
+      ctx.stroke();
+    } else {
+      const newPoints = [points[0]];
+      for (let i = 0; i < points.length - 1; i++) {
+        const midPoint = {
+          x: (points[i].x + points[i + 1].x) / 2 + (points[i + 1].y - points[i].y) / 2,
+          y: (points[i].y + points[i + 1].y) / 2 - (points[i + 1].x - points[i].x) / 2
+        };
+        newPoints.push(midPoint, points[i + 1]);
+      }
+      dragonCurve(newPoints, iteration - 1);
+    }
+  }
+
+  function animateDragonCurve() {
+    if (currentIteration > maxIteration) {
+      currentIteration = 0; // 再描画のためにイテレーションをリセット
+    }
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // キャンバスをクリア
+
+    const x_offset = canvas.width * 0.35; // x軸のオフセットを設定
+    const scaleFactor = 0.5; // 全体を半分のサイズに縮小
+    const startPoint = { x: x_offset, y: y_offset }; // スタートポイントの座標を修正
+    const endPoint = { x: x_offset + (canvas.width / 2 * scaleFactor), y: y_offset }; // エンドポイントの座標も合わせて修正
+    dragonCurve([startPoint, endPoint], currentIteration);
+
+    currentIteration++;
+    setTimeout(animateDragonCurve, animationDelay); // setTimeoutを使ってアニメーションの遅延を設定
+  }
+
+  animateDragonCurve(); // アニメーションを開始
+</script>
+</body>
+</html>

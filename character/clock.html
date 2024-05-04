@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Character</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="content-script-type" content="text/javascript" /> 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Slab:wght@100&family=Sacramento&display=swap" rel="stylesheet">
+<link rel="shortcut icon" type="image/ico" href="../data/favicon.ico" />
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  background-color: black;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+}
+
+.number {
+  font-family: 'Josefin Slab', YuGothic, 'Yu Gothic', sans-serif;
+  position: absolute;
+  color: white;
+  animation: flap 4s infinite linear, spin 5s infinite linear;
+  animation-duration: 4s; /* Adjust flap speed */
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+@keyframes flap {
+  0%, 100% {
+    transform: rotateY(0deg);
+  }
+  50% {
+    transform: rotateY(180deg);
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+</style>
+</head>
+<body>
+<script>
+const numbers = Array.from({length: 24}, (_, i) => i + 1);
+numbers.forEach((number, i) => {
+  const el = document.createElement('div');
+  el.className = 'number';
+  el.textContent = number;
+  el.style.animationDirection = Math.random() < 0.5 ? 'normal' : 'reverse';
+  el.style.fontSize = `${30 + Math.random() * 300}px`;
+  el.style.opacity = `${0.3 + Math.random() * 0.7}`;
+  
+  // Set the initial position
+  el.style.top = `${Math.random() * 100}%`;
+  el.style.left = `${Math.random() * 100}%`;
+
+  // Add movement in a circle
+  let radius = Math.random() * 50; // Random radius
+  let rotationSpeed = (Math.random() * 0.02) + 0.005; // Random rotation speed
+  let rotationDirection = Math.random() < 0.5 ? 1 : -1; // Random rotation direction
+  let xCenter = parseInt(el.style.left);
+  let yCenter = parseInt(el.style.top);
+  let zMovement = 0;
+  let selfRotationSpeed = (Math.random() * 0.1) + 0.02; // Random self rotation speed
+  let selfRotationDirection = Math.random() < 0.5 ? 1 : -1; // Random self rotation direction
+  let selfRotation = 0;
+
+  setInterval(() => {
+    let x = xCenter + radius * Math.cos(rotationSpeed);
+    let y = yCenter + radius * Math.sin(rotationSpeed);
+    el.style.left = `${x}%`;
+    el.style.top = `${y}%`;
+
+    // Add pseudo-3D movement
+    zMovement += 0.05;
+    let z = 10 * Math.sin(zMovement);
+
+    // Add self rotation
+    selfRotation += selfRotationSpeed * selfRotationDirection;
+    el.style.transform = `rotate(${selfRotation}deg) rotateY(${z}deg)`;
+
+    rotationSpeed += 0.01 * rotationDirection; // Apply rotation direction
+  }, 20);
+
+  document.body.appendChild(el);
+});
+</script>
+</body>
+</html>
+

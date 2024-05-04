@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Character</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="content-script-type" content="text/javascript" /> 
+<link rel="shortcut icon" type="image/ico" href="../data/favicon.ico" />
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  background-color: black;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.feather {
+  position: absolute;
+  transform-style: preserve-3d;
+  object-fit: cover;  // Keep aspect ratio
+}
+
+</style>
+</head>
+<body>
+<script>
+const numbers = Array.from({length: 24}, (_, i) => i + 1);
+numbers.forEach((number, i) => {
+  const el = document.createElement('img');
+  el.className = 'feather';
+  el.src = 'feather.png';
+
+  // Set the random size while maintaining aspect ratio
+  let randomSize = `${50 + Math.random() * 200}px`;
+  el.style.width = randomSize;
+  el.style.height = 'auto';  // Keep aspect ratio
+
+  // Set the initial position
+  el.style.top = `${Math.random() * 100}vh`;
+  el.style.left = `${Math.random() * 100}vw`;
+
+  // Set the initial rotation
+  let initialRotation = Math.random() * 360;
+  el.style.transform = `rotate(${initialRotation}deg)`;
+
+  // Add movement in a circle
+  let radius = Math.random() * 50; // Random radius
+  let rotationSpeed = (Math.random() * 0.02) + 0.005; // Random rotation speed
+  let rotationDirection = Math.random() < 0.5 ? 1 : -1; // Random rotation direction
+  let xCenter = parseInt(el.style.left);
+  let yCenter = parseInt(el.style.top);
+  let zMovement = 0;
+  let selfRotationSpeed = (Math.random() * 0.1) + 0.02; // Random self rotation speed
+  let selfRotationDirection = Math.random() < 0.5 ? 1 : -1; // Random self rotation direction
+  let selfRotation = initialRotation;
+
+  setInterval(() => {
+    let x = xCenter + radius * Math.cos(rotationSpeed);
+    let y = yCenter + radius * Math.sin(rotationSpeed);
+    el.style.left = `${x}%`;
+    el.style.top = `${y}%`;
+
+    // Add pseudo-3D movement
+    zMovement += 0.05;
+    let z = 10 * Math.sin(zMovement);
+
+    // Add self rotation
+    selfRotation += selfRotationSpeed * selfRotationDirection;
+    el.style.transform = `rotate(${selfRotation}deg) rotateY(${z}deg)`;
+
+    rotationSpeed += 0.01 * rotationDirection; // Apply rotation direction
+  }, 20);
+
+  document.body.appendChild(el);
+});
+</script>
+</body>
+</html>
+ 
