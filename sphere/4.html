@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <title>Sphere</title>
+    <link rel="shortcut icon" type="image/ico" href="../data/favicon.ico" />
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        let scene, camera, renderer, sphere, pointLight, ambientLight, clock;
+        let sphereSize = 20; // 球体のサイズを設定する新しい変数
+
+        function init() {
+            // シーンを作成
+            scene = new THREE.Scene();
+
+            // カメラを作成
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 0, 100);
+
+            // レンダラーを作成
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            // 球体を作成（元々の二十面体の「面数」を大幅に増やす）
+            const geometry = new THREE.IcosahedronGeometry(sphereSize, 5); // detailパラメータを5に設定してより滑らかに
+            const material = new THREE.MeshStandardMaterial({color: 0xffffff, wireframe: true});
+            sphere = new THREE.Mesh(geometry, material);
+            scene.add(sphere);
+
+            // 点光源を作成
+            pointLight = new THREE.PointLight(0xffffff, 1, 500);
+            pointLight.position.set(50, 50, 50);
+            scene.add(pointLight);
+
+            // 環境光を追加
+            ambientLight = new THREE.AmbientLight(0x404040); // ソフトな白色光
+            scene.add(ambientLight);
+
+            // 時計を作成
+            clock = new THREE.Clock();
+
+            // ウィンドウがリサイズされた時の処理
+            window.addEventListener('resize', onWindowResize, false);
+
+            // アニメーションの実行
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const elapsedTime = clock.getElapsedTime();
+
+            // 球体のアニメーション（回転）
+            sphere.rotation.x = elapsedTime * 0.5;
+            sphere.rotation.y = elapsedTime * 0.5;
+
+            // 光源のアニメーション
+            pointLight.position.x = Math.sin(elapsedTime * 2) * 30; // 速度を2倍に
+            pointLight.position.z = Math.cos(elapsedTime * 2) * 30; // Z軸を使って円運動
+
+            // 球体の色変更アニメーション
+            sphere.material.color.setHSL(Math.sin(elapsedTime * 0.3), 0.5, 0.5);
+
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        init();
+    </script>
+</body>
+</html>
